@@ -280,177 +280,6 @@ Now I can open a file with `$ subl myfile.py` or start a new project in the curr
 
 Sublime Text is very extensible. For now we'll leave it like that, we already have a solid installation. To add more in the future, a good place to start would be to install the [Sublime Package Control](http://wbond.net/sublime_packages/package_control/installation).
 
-## Vim
-
-Although Sublime Text will be our main editor, it is a good idea to learn some very basic usage of [Vim](http://www.vim.org/). It is a very popular text editor inside the terminal, and is usually pre-installed on any Unix system.
-
-For example, when you run a Git commit, it will open Vim to allow you to type the commit message.
-
-I suggest you read a tutorial on Vim. Grasping the concept of the two "modes" of the editor, **Insert** (by pressing `i`) and **Normal** (by pressing `Esc` to exit Insert mode), will be the part that feels most unatural. After that it's just remembering a few important keys.
-
-Vim's default settings aren't great, and you could spend a lot of time tweaking your configuration (the `.vimrc` file). But if you're like me and just use Vim occasionally, you'll be happy to know that [Tim Pope](https://github.com/tpope) has put together some sensible defaults to quickly get started.
-
-First, install [pathogen.vim](https://github.com/tpope/vim-pathogen) by running:
-
-    $ mkdir -p ~/.vim/autoload ~/.vim/bundle
-    $ curl -Sso ~/.vim/autoload/pathogen.vim \
-        https://raw.github.com/tpope/vim-pathogen/master/autoload/pathogen.vim
-
-Then create a file `~/.vimrc` (you can use `$ subl ~/.vimrc`), and paste in the following:
-
-    execute pathogen#infect()
-    syntax on
-    filetype plugin indent on
-
-And finally, install the Vim "sensible defaults" by running:
-
-    $ cd ~/.vim/bundle
-    $ git clone git://github.com/tpope/vim-sensible.git
-
-With that, Vim will look a lot better next time you open it!
-
-## Python
-
-OS X, like Linux, ships with [Python](http://python.org/) already installed. But you don't want to mess with the system Python (some system tools rely on it, etc.), so we'll install our own version with Homebrew. It will also allow us to get the very latest version of Python 2.7.
-
-The following command will install Python 2.7 and any dependencies required (it can take a few minutes to build everything):
-
-    $ brew install python
-    
-When finished, you should get a summary in the terminal. Running `$ which python` should output `/usr/local/bin/python`.
-
-It also installed [Pip]() (and its dependency [Distribute]()), which is the package manager for Python. Let's upgrade them both:
-
-    $ pip install --upgrade distribute
-    $ pip install --upgrade pip
-    
-Executable scripts from Python packages you install will be put in `/usr/local/share/python`, so let's add it to the `$PATH`. To do so, we'll create a `.path` text file in the home directory (I've already set up `.bash_profile` to call this file):
-
-    $ cd ~
-    $ subl .path
-    
-And add these lines to `.path`:
-
-```bash
-PATH=/usr/local/share/python:$PATH
-export PATH
-```
-    
-Save the file and open a new terminal to take the new `$PATH` into account (everytime you open a terminal, `.bash_profile` gets loaded).
-
-### Pip Usage
-
-Here are a couple Pip commands to get you started. To install a Python package:
-
-    $ pip install <package>
-
-To upgrade a package:
-
-    $ pip install --upgrade <package>
-        
-To see what's installed:
-
-    $ pip freeze
-    
-To uninstall a package:
-
-    $ pip uninstall <package>
-
-## Virtualenv
-
-[Virtualenv](http://www.virtualenv.org/) is a tool that creates an isolated Python environment for each of your projects. For a particular project, instead of installing required packages globally, it is best to install them in an isolated folder in the project (say a folder named `venv`), that will be managed by virtualenv.
-
-The advantage is that different projects might require different versions of packages, and it would be hard to manage that if you install packages globally. It also allows you to keep your global `/usr/local/lib/python2.7/site-packages` folder clean, containing only critical or big packages that you always need (like IPython, Numpy).
-
-### Install
-
-To install virtualenv, simply run:
-
-    $ pip install virtualenv
-
-### Usage
-
-Let's say you have a project in a directory called `myproject`. To set up virtualenv for that project:
-
-    $ cd myproject/
-    $ virtualenv venv --distribute
-    
-If you want your virtualenv to also inherit globally installed packages (like IPython or Numpy mentioned above), use:
-
-    $ virtualenv venv --distribute --system-site-packages
-
-These commands create a `venv` subdirectory in your project where everything is installed. You need to **activate** it first though (in every terminal where you are working on your project):
-
-    $ source venv/bin/activate
-    
-You should see a `(venv)` appear at the beginning of your terminal prompt indicating that you are working inside the virtualenv. Now when you install something:
-
-    $ pip install <package>
-
-It will get installed in the `venv` folder, and not conflict with other projects.
-
-**Important**: Remember to add `venv` to your project's `.gitignore` file so you don't include all of that in your source code!
-
-As mentioned earlier, I like to install big packages (like Numpy), or packages I always use (like IPython) globally. All the rest I install in a virtualenv.
-
-## IPython
-
-[IPython](http://ipython.org/) is an awesome project which provides a much better Python shell than the one you get from running `$ python` in the command-line. It has many cool functions (running Unix commands from the Python shell, easy copy & paste, creating Matplotlib charts in-line, etc.) and I'll let you refer to the [documentation](http://ipython.org/ipython-doc/stable/index.html) to discover them.
-
-### Install
-
-Before we install IPython, we'll need to get some dependencies. Run the following:
-
-    $ brew update # Always good to do
-    $ brew install zeromq # Necessary for pyzmq
-    $ brew install pyqt # Necessary for the qtconsole
-    
-It may take a few minutes to build these.
-
-Once it's done, we can install IPython with all the available options:
-
-    $ pip install ipython[zmq,qtconsole,notebook,test]
-
-### Usage
-
-You can launch IPython from the command line with `$ ipython`, but what's more interesting is to use its [QT Console](http://ipython.org/ipython-doc/stable/interactive/qtconsole.html). Launch the QT Console by running:
-
-    $ ipython qtconsole
-    
-You can also customize the font it uses:
-
-    $ ipython qtconsole --ConsoleWidget.font_family="Consolas" --ConsoleWidget.font_size=13
-    
-And since I'm lazy and I don't want to type or copy & paste that all the time, I'm going to create an alias for it. Create a `.extra` text file in your home directory with `$ subl ~/.extra` (I've set up `.bash_profile` to load `.extra`), and add the following line:
-
-```bash
-alias ipy='ipython qtconsole --ConsoleWidget.font_family="Consolas" --ConsoleWidget.font_size=13'
-```
-    
-Open a fresh terminal. Now when you run `$ ipy`, it will launch the QT Console with your configured options.
-
-To use the in-line Matplotlib functionality (nice for scientific computing), run `$ ipy --pylab=inline`.
-
-## Numpy and Scipy
-
-The [Numpy](http://numpy.scipy.org/) and [Scipy](http://www.scipy.org/SciPy) scientific libraries for Python are always a little tricky to install from source because they have all these dependencies they need to build correctly. Luckily for us, [Samuel John](http://www.samueljohn.de/) has put together some [Homebrew formulae](https://github.com/samueljohn/homebrew-python) to make it easier to install these Python libraries.
-
-First, grab the special formulae (which are not part of Homebrew core):
-
-    $ brew tap samueljohn/python
-    $ brew tap homebrew/science
-    
-Then, install the `gfortran` dependency which we will need to build the libraries:
-
-    $ brew install gfortran
-    
-Finally, you can install Numpy and Scipy with:
-
-    $ brew install numpy
-    $ brew install scipy
-    
-(It may take a few minutes to build.)
-
 ## MySQL
 
 ### Install
@@ -799,4 +628,176 @@ Here is a quick list of some apps I use, and that you might find useful as well:
 - [Evernote](https://evernote.com/): If I don't write something down, I'll forget it. As a developer, you learn so many new things every day, and technology keeps changing, it would be insane to want to keep it all in your head. So take notes, sync them to the cloud, and have them on all your devices. To be honest, I switched to [Simplenote](http://simplenote.com/) because I only take text notes, and I got tired of Evernote putting extra spaces between paragraphs when I copy & pasted into other applications. Simplenote is so much better for text notes (and it supports Markdown!). **(Both are free)**
 - [Moom](http://manytricks.com/moom/): Don't waste time resizing and moving your windows. Moom makes this very easy. **($10)**
 
+================================
+UNUSED ITEMS
 
+## Vim
+
+Although Sublime Text will be our main editor, it is a good idea to learn some very basic usage of [Vim](http://www.vim.org/). It is a very popular text editor inside the terminal, and is usually pre-installed on any Unix system.
+
+For example, when you run a Git commit, it will open Vim to allow you to type the commit message.
+
+I suggest you read a tutorial on Vim. Grasping the concept of the two "modes" of the editor, **Insert** (by pressing `i`) and **Normal** (by pressing `Esc` to exit Insert mode), will be the part that feels most unatural. After that it's just remembering a few important keys.
+
+Vim's default settings aren't great, and you could spend a lot of time tweaking your configuration (the `.vimrc` file). But if you're like me and just use Vim occasionally, you'll be happy to know that [Tim Pope](https://github.com/tpope) has put together some sensible defaults to quickly get started.
+
+First, install [pathogen.vim](https://github.com/tpope/vim-pathogen) by running:
+
+    $ mkdir -p ~/.vim/autoload ~/.vim/bundle
+    $ curl -Sso ~/.vim/autoload/pathogen.vim \
+        https://raw.github.com/tpope/vim-pathogen/master/autoload/pathogen.vim
+
+Then create a file `~/.vimrc` (you can use `$ subl ~/.vimrc`), and paste in the following:
+
+    execute pathogen#infect()
+    syntax on
+    filetype plugin indent on
+
+And finally, install the Vim "sensible defaults" by running:
+
+    $ cd ~/.vim/bundle
+    $ git clone git://github.com/tpope/vim-sensible.git
+
+With that, Vim will look a lot better next time you open it!
+
+## Python
+
+OS X, like Linux, ships with [Python](http://python.org/) already installed. But you don't want to mess with the system Python (some system tools rely on it, etc.), so we'll install our own version with Homebrew. It will also allow us to get the very latest version of Python 2.7.
+
+The following command will install Python 2.7 and any dependencies required (it can take a few minutes to build everything):
+
+    $ brew install python
+    
+When finished, you should get a summary in the terminal. Running `$ which python` should output `/usr/local/bin/python`.
+
+It also installed [Pip]() (and its dependency [Distribute]()), which is the package manager for Python. Let's upgrade them both:
+
+    $ pip install --upgrade distribute
+    $ pip install --upgrade pip
+    
+Executable scripts from Python packages you install will be put in `/usr/local/share/python`, so let's add it to the `$PATH`. To do so, we'll create a `.path` text file in the home directory (I've already set up `.bash_profile` to call this file):
+
+    $ cd ~
+    $ subl .path
+    
+And add these lines to `.path`:
+
+```bash
+PATH=/usr/local/share/python:$PATH
+export PATH
+```
+    
+Save the file and open a new terminal to take the new `$PATH` into account (everytime you open a terminal, `.bash_profile` gets loaded).
+
+### Pip Usage
+
+Here are a couple Pip commands to get you started. To install a Python package:
+
+    $ pip install <package>
+
+To upgrade a package:
+
+    $ pip install --upgrade <package>
+        
+To see what's installed:
+
+    $ pip freeze
+    
+To uninstall a package:
+
+    $ pip uninstall <package>
+
+## Virtualenv
+
+[Virtualenv](http://www.virtualenv.org/) is a tool that creates an isolated Python environment for each of your projects. For a particular project, instead of installing required packages globally, it is best to install them in an isolated folder in the project (say a folder named `venv`), that will be managed by virtualenv.
+
+The advantage is that different projects might require different versions of packages, and it would be hard to manage that if you install packages globally. It also allows you to keep your global `/usr/local/lib/python2.7/site-packages` folder clean, containing only critical or big packages that you always need (like IPython, Numpy).
+
+### Install
+
+To install virtualenv, simply run:
+
+    $ pip install virtualenv
+
+### Usage
+
+Let's say you have a project in a directory called `myproject`. To set up virtualenv for that project:
+
+    $ cd myproject/
+    $ virtualenv venv --distribute
+    
+If you want your virtualenv to also inherit globally installed packages (like IPython or Numpy mentioned above), use:
+
+    $ virtualenv venv --distribute --system-site-packages
+
+These commands create a `venv` subdirectory in your project where everything is installed. You need to **activate** it first though (in every terminal where you are working on your project):
+
+    $ source venv/bin/activate
+    
+You should see a `(venv)` appear at the beginning of your terminal prompt indicating that you are working inside the virtualenv. Now when you install something:
+
+    $ pip install <package>
+
+It will get installed in the `venv` folder, and not conflict with other projects.
+
+**Important**: Remember to add `venv` to your project's `.gitignore` file so you don't include all of that in your source code!
+
+As mentioned earlier, I like to install big packages (like Numpy), or packages I always use (like IPython) globally. All the rest I install in a virtualenv.
+
+## IPython
+
+[IPython](http://ipython.org/) is an awesome project which provides a much better Python shell than the one you get from running `$ python` in the command-line. It has many cool functions (running Unix commands from the Python shell, easy copy & paste, creating Matplotlib charts in-line, etc.) and I'll let you refer to the [documentation](http://ipython.org/ipython-doc/stable/index.html) to discover them.
+
+### Install
+
+Before we install IPython, we'll need to get some dependencies. Run the following:
+
+    $ brew update # Always good to do
+    $ brew install zeromq # Necessary for pyzmq
+    $ brew install pyqt # Necessary for the qtconsole
+    
+It may take a few minutes to build these.
+
+Once it's done, we can install IPython with all the available options:
+
+    $ pip install ipython[zmq,qtconsole,notebook,test]
+
+### Usage
+
+You can launch IPython from the command line with `$ ipython`, but what's more interesting is to use its [QT Console](http://ipython.org/ipython-doc/stable/interactive/qtconsole.html). Launch the QT Console by running:
+
+    $ ipython qtconsole
+    
+You can also customize the font it uses:
+
+    $ ipython qtconsole --ConsoleWidget.font_family="Consolas" --ConsoleWidget.font_size=13
+    
+And since I'm lazy and I don't want to type or copy & paste that all the time, I'm going to create an alias for it. Create a `.extra` text file in your home directory with `$ subl ~/.extra` (I've set up `.bash_profile` to load `.extra`), and add the following line:
+
+```bash
+alias ipy='ipython qtconsole --ConsoleWidget.font_family="Consolas" --ConsoleWidget.font_size=13'
+```
+    
+Open a fresh terminal. Now when you run `$ ipy`, it will launch the QT Console with your configured options.
+
+To use the in-line Matplotlib functionality (nice for scientific computing), run `$ ipy --pylab=inline`.
+
+## Numpy and Scipy
+
+The [Numpy](http://numpy.scipy.org/) and [Scipy](http://www.scipy.org/SciPy) scientific libraries for Python are always a little tricky to install from source because they have all these dependencies they need to build correctly. Luckily for us, [Samuel John](http://www.samueljohn.de/) has put together some [Homebrew formulae](https://github.com/samueljohn/homebrew-python) to make it easier to install these Python libraries.
+
+First, grab the special formulae (which are not part of Homebrew core):
+
+    $ brew tap samueljohn/python
+    $ brew tap homebrew/science
+    
+Then, install the `gfortran` dependency which we will need to build the libraries:
+
+    $ brew install gfortran
+    
+Finally, you can install Numpy and Scipy with:
+
+    $ brew install numpy
+    $ brew install scipy
+    
+(It may take a few minutes to build.)
